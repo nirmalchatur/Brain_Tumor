@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeevanrekha | Brain Tumor Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0066cc;
+            --dark-blue: #004080;
+            --teal: #00a3a3;
+            --green: #00b894;
+            --red: #ff4757;
+            --white: #ffffff;
+            --light-gray: #f0f9ff;
+            --medium-gray: #e0e7ff;
+            --dark-gray: #64748b;
+            --border: #cbd5e1;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+
+        .username-bar {
+            position: fixed;
+            top: 1.5rem;
+            right: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--white);
+            padding: 0.75rem 1.5rem;
+            border-radius: 3rem;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .username-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .username-bar span {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .username-bar button {
+            background: none;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .username-bar button:hover {
+            background: rgba(255, 71, 87, 0.1);
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .box {
+            background: var(--white);
+            border-radius: 1.5rem;
+            padding: 3rem;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            position: relative;
+            display: inline-block;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--teal));
+            border-radius: 2px;
+        }
+
+        .subtext {
+            font-size: 1.1rem;
+            color: var(--dark-gray);
+            margin-bottom: 2.5rem;
+            max-width: 700px;
+        }
+
+        .upload-form {
+            margin: 2.5rem 0;
+        }
+
+        .model-selection {
+            margin-bottom: 1.5rem;
+        }
+
+        .model-selection label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-blue);
+        }
+
+        .model-selection select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--white);
+            transition: all 0.3s ease;
+        }
+
+        .model-selection select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        .upload-form input[type="file"] {
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            position: absolute;
+        }
+
+        .upload-form label[for="file"] {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            background: var(--primary-blue);
+            color: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            margin: 0 auto;
+            width: fit-content;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 102, 204, 0.2);
+        }
+
+        .upload-form label[for="file"]:hover {
+            background: var(--dark-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 102, 204, 0.3);
+        }
+
+        .upload-form button[type="submit"] {
+            background: var(--green);
+            color: var(--white);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            width: 100%;
+            max-width: 200px;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 184, 148, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .upload-form button[type="submit"]:hover {
+            background: #009d7a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 184, 148, 0.3);
+        }
+
+        .error-message {
+            color: var(--red);
+            padding: 1rem;
+            background: rgba(255, 71, 87, 0.1);
+            border-radius: 0.75rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--red);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .result-section {
+            margin-top: 3rem;
+            display: {% if prediction is defined and prediction %}block{% else %}none{% endif %};
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .diagnosis-card {
+            background: var(--light-gray);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary-blue);
+        }
+
+        .diagnosis-badge {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border-radius: 2rem;
+            background: {% if prediction == 'Tumor Detected' %}var(--red){% else %}var(--green){% endif %};
+            color: var(--white);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .diagnosis-card h3 {
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            margin-bottom: 1rem;
+        }
+
+        .confidence-meter {
+            height: 12px;
+            background: var(--medium-gray);
+            border-radius: 6px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--teal));
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .image-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .image-box {
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+
+        .image-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-label {
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--white);
+            padding: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .model-metrics {
+            margin-top: 3rem;
+            background: var(--white);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .model-metrics h3 {
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .model-metrics h3 i {
+            color: var(--primary-blue);
+        }
+
+        .metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .metrics-table th, .metrics-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .metrics-table th {
+            background-color: var(--light-gray);
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        .metrics-table tr:hover {
+            background-color: rgba(0, 102, 204, 0.03);
+        }
+
+        .current-model {
+            background-color: rgba(0, 184, 148, 0.05);
+            position: relative;
+        }
+
+        .current-model::after {
+            content: '✓';
+            position: absolute;
+            right: 1rem;
+            color: var(--green);
+            font-weight: bold;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: var(--dark-blue);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-bar {
+            height: 8px;
+            background: var(--medium-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .metric-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--teal));
+        }
+
+        .note {
+            font-size: 0.9rem;
+            color: var(--dark-gray);
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--light-gray);
+            border-radius: 0.75rem;
+            border-left: 3px solid var(--teal);
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 5rem 1.5rem 2rem;
+            }
+            
+            .box {
+                padding: 2rem 1.5rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-form button[type="submit"] {
+                max-width: 100%;
+            }
+            
+            .username-bar {
+                top: 0.5rem;
+                right: 0.5rem;
+                padding: 0.5rem 1rem;
+            }
+            
+            .image-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% if session.username %}
+    <div class="username-bar">
+        <i class="fas fa-user-circle"></i>
+        <span>{{ session.username }}</span>
+        <form action="{{ url_for('logout') }}" method="GET">
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="main-container">
+        <div class="box">
+            <h1>Jeevanrekha</h1>
+            <p class="subtext">
+                Advanced AI-powered brain tumor detection using deep learning models. 
+                Upload an MRI scan to receive instant analysis and visualization.
+            </p>
+            
+            <form method="POST" action="/predict" enctype="multipart/form-data" class="upload-form">
+                <div class="model-selection">
+                    <label for="model_choice"><i class="fas fa-brain"></i> Select AI Model:</label>
+                    <select name="model_choice" id="model_choice" required>
+                        {% for model in model_choices %}
+                        <option value="{{ model }}" {% if model == model_used %}selected{% endif %}>{{ model }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <input type="file" name="file" id="file" accept="image/*" required>
+                <label for="file">
+                    <i class="fas fa-file-upload"></i> Choose MRI File
+                </label>
+                <button type="submit">
+                    <i class="fas fa-search"></i> Analyze Scan
+                </button>
+            </form>
+
+            {% if error %}
+            <div class="error-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <div class="result-section">
+                {% if prediction is defined and prediction %}
+                <div class="diagnosis-card">
+                    <div class="diagnosis-badge">
+                        <i class="fas fa-{% if prediction == 'Tumor Detected' %}exclamation-circle{% else %}check-circle{% endif %}"></i>
+                        {{ prediction }}
+                    </div>
+                    <h3>Analysis Results</h3>
+                    <p><i class="fas fa-cogs"></i> Model Used: <strong>{{ model_used }}</strong></p>
+                    
+                    <div class="confidence-meter">
+                        <div class="confidence-fill" style="width: {{ accuracy }}%;"></div>
+                    </div>
+                    <p><i class="fas fa-chart-line"></i> Confidence: <strong>{{ accuracy }}%</strong></p>
+                </div>
+
+                <div class="image-comparison">
+                    <div class="image-box">
+                        <img src="{{ url_for('static', filename='uploads/' + original_filename) }}" alt="Original MRI">
+                        <div class="image-label"><i class="fas fa-image"></i> Original Scan</div>
+                    </div>
+                    <div class="image-box">
+                        <img src="{{ url_for('static', filename='outputs/' + output_filename) }}" alt="Analyzed MRI">
+                        <div class="image-label"><i class="fas fa-eye"></i> Analysis Visualization</div>
+                    </div>
+                </div>
+
+                <div class="model-metrics">
+                    <h3><i class="fas fa-chart-bar"></i> Model Performance Metrics</h3>
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Accuracy</th>
+                                <th>Precision</th>
+                                <th>Recall</th>
+                                <th>F1-Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr {% if model_used == 'ResNet50' %}class="current-model"{% endif %}>
+                                <td><i class="fas fa-network-wired"></i> ResNet50</td>
+                                <td>
+                                    <span class="metric-value">94.2%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 94.2%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">92.5%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 92.5%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">93.8%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 93.8%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">93.1%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 93.1%"></div></div>
+                                </td>
+                            </tr>
+                            <tr {% if model_used == 'VGG16' %}class="current-model"{% endif %}>
+                                <td><i class="fas fa-layer-group"></i> VGG16</td>
+                                <td>
+                                    <span class="metric-value">92.7%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 92.7%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">91.3%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 91.3%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">93.5%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 93.5%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">92.4%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 92.4%"></div></div>
+                                </td>
+                            </tr>
+                            <tr {% if model_used == 'InceptionV3' %}class="current-model"{% endif %}>
+                                <td><i class="fas fa-project-diagram"></i> InceptionV3</td>
+                                <td>
+                                    <span class="metric-value">93.5%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 93.5%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">92.8%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 92.8%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">94.1%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 94.1%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">93.4%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 93.4%"></div></div>
+                                </td>
+                            </tr>
+                            <tr {% if model_used == 'EfficientNet' %}class="current-model"{% endif %}>
+                                <td><i class="fas fa-bolt"></i> EfficientNet</td>
+                                <td>
+                                    <span class="metric-value">95.1%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 95.1%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">94.7%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 94.7%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">95.3%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 95.3%"></div></div>
+                                </td>
+                                <td>
+                                    <span class="metric-value">95.0%</span>
+                                    <div class="metric-bar"><div class="metric-bar-fill" style="width: 95.0%"></div></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="note">
+                        <strong><i class="fas fa-info-circle"></i> Note:</strong> These metrics represent validation performance on our test dataset.
+                        The currently selected model is highlighted.
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide results section based on form submission
+        document.querySelector('form.upload-form').addEventListener('submit', function() {
+            document.querySelector('.result-section').style.display = 'none';
+        });
+
+        // Initialize results section visibility
+        document.addEventListener('DOMContentLoaded', function() {
+            const resultSection = document.querySelector('.result-section');
+            // Check if there's content in the results section
+            if (resultSection.innerHTML.trim() !== '') {
+                resultSection.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

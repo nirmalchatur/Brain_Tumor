@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hospital Login | Jeevanrekha</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hospital-blue: #0066cc;
+            --hospital-dark-blue: #004080;
+            --hospital-teal: #00a3a3;
+            --hospital-green: #00b894;
+            --hospital-red: #ff4757;
+            --hospital-white: #f8fafc;
+            --hospital-light-gray: #e0e7ff;
+            --hospital-dark-gray: #64748b;
+            --hospital-border: #cbd5e1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f9ff;
+            background-image: 
+                linear-gradient(rgba(240, 249, 255, 0.9), rgba(240, 249, 255, 0.9)),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" fill="none" stroke="%230066cc" stroke-width="0.5" opacity="0.1"><path d="M30,20 L70,20 L80,30 L80,70 L70,80 L30,80 L20,70 L20,30 Z M50,35 L50,65 M35,50 L65,50"/></svg>');
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ECG Monitor Background Animation */
+        .ecg-monitor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.05;
+            overflow: hidden;
+        }
+
+        .ecg-line {
+            position: absolute;
+            top: 50%;
+            width: 200%;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                var(--hospital-red) 5%, 
+                transparent 10%,
+                transparent 45%,
+                var(--hospital-red) 50%,
+                transparent 55%,
+                transparent 90%,
+                var(--hospital-red) 95%,
+                transparent 100%
+            );
+            background-size: 50% 100%;
+            animation: ecgScroll 15s linear infinite;
+        }
+
+        @keyframes ecgScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Hospital ID Badge Styling */
+        .container {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 
+                0 10px 25px rgba(0, 102, 204, 0.1),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--hospital-border);
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, 
+                var(--hospital-blue), 
+                var(--hospital-teal),
+                var(--hospital-green)
+            );
+            animation: hospitalColors 8s linear infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes hospitalColors {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        .container::after {
+            content: 'HOSPITAL STAFF LOGIN';
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background-color: var(--hospital-red);
+            color: white;
+            padding: 3px 30px;
+            font-size: 12px;
+            font-weight: 600;
+            transform: rotate(45deg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Medical Logo Animation */
+        .logo {
+            width: 80px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 2px 4px rgba(0, 102, 204, 0.2));
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            color: var(--hospital-dark-blue);
+            font-size: 28px;
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: var(--hospital-teal);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .tagline {
+            color: var(--hospital-dark-gray);
+            margin-bottom: 25px;
+            font-size: 15px;
+            font-weight: 400;
+            position: relative;
+        }
+
+        /* Medical Form Styling */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--hospital-dark-blue);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .form-group label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        #username + label::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230066cc"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+        }
+
+        #password + label::before {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%230066cc"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>');
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 40px;
+            border: 1px solid var(--hospital-border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background-color: var(--hospital-light-gray);
+            background-repeat: no-repeat;
+            background-position: 15px center;
+            background-size: 18px;
+        }
+
+        #username {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2364748b"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>');
+        }
+
+        #password {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%2364748b"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>');
+        }
+
+        input:focus {
+            border-color: var(--hospital-blue);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+            background-color: white;
+        }
+
+        /* Hospital Login Button */
+        button {
+            background: linear-gradient(135deg, var(--hospital-blue), var(--hospital-teal));
+            color: white;
+            padding: 14px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.2), 
+                transparent
+            );
+            transition: all 0.5s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Medical Emergency Alert */
+        .error {
+            color: var(--hospital-red);
+            font-size: 14px;
+            margin: 15px 0;
+            padding: 12px;
+            background-color: rgba(255, 71, 87, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid var(--hospital-red);
+            font-weight: 500;
+            animation: pulseAlert 0.8s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .error::before {
+            content: '⚠';
+            margin-right: 8px;
+            font-size: 18px;
+        }
+
+        @keyframes pulseAlert {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Hospital Links */
+        .links {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .link {
+            font-size: 14px;
+            color: var(--hospital-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 1px;
+            background: var(--hospital-blue);
+            transition: width 0.3s ease;
+        }
+
+        .link:hover::after {
+            width: 100%;
+        }
+
+        /* Hospital Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            color: var(--hospital-dark-gray);
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--hospital-border);
+        }
+
+        .divider::before {
+            margin-right: 10px;
+        }
+
+        .divider::after {
+            margin-left: 10px;
+        }
+
+        /* Floating Medical Elements */
+        .floating-medical {
+            position: absolute;
+            opacity: 0.1;
+            z-index: -1;
+            animation: floatElement 15s infinite linear;
+            font-size: 24px;
+        }
+
+        @keyframes floatElement {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -20px) rotate(90deg); }
+            50% { transform: translate(40px, 0) rotate(180deg); }
+            75% { transform: translate(20px, 20px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ECG Monitor Background -->
+    <div class="ecg-monitor">
+        <div class="ecg-line"></div>
+    </div>
+
+    <!-- Floating Medical Icons -->
+    <div class="floating-medical" style="top: 10%; left: 10%;">🩺</div>
+    <div class="floating-medical" style="top: 70%; left: 80%; animation-delay: 2s;">💊</div>
+    <div class="floating-medical" style="top: 30%; left: 85%; animation-delay: 4s;">🧪</div>
+    <div class="floating-medical" style="top: 80%; left: 15%; animation-delay: 6s;">🩹</div>
+
+    <div class="container">
+        <img src="{{ url_for('static', filename='pictures/brainstorm.png') }}" alt="Hospital Logo" class="logo">
+        <h2>Jeevanrekha</h2>
+        <p class="tagline">Hospital Diagnostic Portal</p>
+
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <input type="text" id="username" name="username" placeholder="Staff ID" required>
+                <label for="username">Staff Name</label>
+            </div>
+            
+            <div class="form-group">
+                <input type="password" id="password" name="password" placeholder="Access Code" required>
+                <label for="password">Access Code</label>
+            </div>
+
+            <button type="submit">
+                <span>🔒</span> Login
+            </button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+
+        <div class="links">
+            <a href="/forgot-password" class="link">Forgot Access Code?</a>
+            <div class="divider">or</div>
+            <a href="/register" class="link">Request System Access</a>
+        </div>
+    </div>
+
+    <script>
+        // Add ripple effect to login button
+        const loginButton = document.querySelector('button[type="submit"]');
+        if (loginButton) {
+            loginButton.addEventListener('click', function(e) {
+                // Create ripple element
+                const ripple = document.createElement('span');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.4)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.pointerEvents = 'none';
+                
+                // Position ripple
+                const rect = this.getBoundingClientRect();
+                ripple.style.left = `${e.clientX - rect.left}px`;
+                ripple.style.top = `${e.clientY - rect.top}px`;
+                
+                this.appendChild(ripple);
+                
+                // Remove ripple after animation
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        }
+
+        // Add floating medical elements dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            const medicalIcons = ['🩺', '💉', '🩹', '💊', '🧪', '🧫', '🦠', '🧬', '🏥', '🚑'];
+            const container = document.body;
+            
+            for (let i = 0; i < 8; i++) {
+                const icon = document.createElement('div');
+                icon.className = 'floating-medical';
+                icon.textContent = medicalIcons[Math.floor(Math.random() * medicalIcons.length)];
+                icon.style.top = `${Math.random() * 100}%`;
+                icon.style.left = `${Math.random() * 100}%`;
+                icon.style.fontSize = `${20 + Math.random() * 30}px`;
+                icon.style.animationDuration = `${10 + Math.random() * 20}s`;
+                icon.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(icon);
+            }
+        });
+
+        // Add focus effects to inputs
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentNode.querySelector('label').style.color = 'var(--hospital-blue)';
+                this.style.backgroundImage = this.style.backgroundImage.replace('%2364748b', '%230066cc');
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentNode.querySelector('label').style.color = 'var(--hospital-dark-blue)';
+                this.style.backgroundImage = this.style.backgroundImage.replace('%230066cc', '%2364748b');
+            });
+        });
+    </script>
+</body>
+</html>
